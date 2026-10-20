@@ -73,13 +73,13 @@ export default function NhsPayCalc({ nation: n0 = 'england', band: b0 = '5', ste
             <SelectField id={id('nation')} label="Where you work" value={nation} onChange={onNation} options={NATION_OPTS} />
             <SelectField id={id('hcas')} label="London area (HCAS)" value={area} onChange={(v) => setArea(v as HcasArea)} options={AREA_OPTS} help={nation === 'england' ? 'Inner, outer London or fringe' : 'England only'} />
           </div>
+          <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:gap-y-0">
+            <NumberField id={id('fte')} label="Share of full-time hours" value={fte} onChange={setFte} unit="%" max={100} help="100 % = full time; 60 % = 22.5 of 37.5 hours" />
+            <SelectField id={id('loan')} label="Student loan" value={loan} onChange={setLoan} options={LOAN_OPTS} />
+          </div>
           <details className="group border-t border-navy-200 pt-3">
-            <summary className="cursor-pointer text-sm font-medium text-accent-700">More: hours, student loan, Scottish tax, pension</summary>
+            <summary className="cursor-pointer text-sm font-medium text-accent-700">More: where you pay tax, pension membership</summary>
             <div className="mt-3 grid gap-4">
-              <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:gap-y-0">
-                <NumberField id={id('fte')} label="Share of full-time hours" value={fte} onChange={setFte} unit="%" max={100} help="100 % = full time; 60 % = 22.5 of 37.5 hours" />
-                <SelectField id={id('loan')} label="Student loan" value={loan} onChange={setLoan} options={LOAN_OPTS} />
-              </div>
               <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:gap-y-0">
                 <SelectField id={id('tax')} label="Where you pay income tax" value={tax} onChange={setTax} options={TAX_OPTS} help="Scottish rates if you live in Scotland" />
                 <SelectField id={id('pen')} label="In the pension scheme" value={inScheme} onChange={setInScheme} options={YESNO} help={SCHEME_SHORT[sch]} />

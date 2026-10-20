@@ -1,8 +1,8 @@
 ---
 /**
- * Home: the ISA against taxable account calculator on the first screen, then the grid nobody else
- * publishes (what an ISA is worth by income and balance, both years), the April 2027 timeline and the
- * four layers of tax-free interest (RECETTE §5, §21). Every figure comes from the engines.
+ * Home: the NHS take-home calculator on the first screen, then key figures, the band ladder in two
+ * nations, the order of deductions, the teacher ladder, the two pensions, what is still to come and the
+ * sources (RECETTE §5, §21). Every figure comes from the engines and the parameter file.
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import Tool from './Tool.astro';
@@ -15,90 +15,114 @@ import { displayDate } from '../lib/format';
 import { faqSchema, webApplicationSchema, websiteSchema, organizationSchema } from '../lib/seo';
 const lang = 'en';
 const h = helpers(true);
-const { P, S, PB, m, m2, pc, Y1, Y2 } = h;
-const A = h.y(Y1), B = h.y(Y2);
-const RATE = 0.04;
-const incomes = [16000, 35000, 52000, 75000, 110000, 150000];
-const balances = [20000, 50000, 100000];
-const gain = (inc: number, bal: number, y: typeof Y1) => S.interestTax(y, inc, bal * RATE).tax;
-const grid = incomes.map((inc) => [m(inc), ...balances.flatMap((b) => [m(gain(inc, b, Y1)), m(gain(inc, b, Y2))])]);
-const ex = S.compare({ nonSavings: 52000, balance: 50000, rate: RATE });
-const pensioner = S.interestTax(Y1, 16000, 100000 * RATE);
-const freeBasic = S.taxFreeBalance(Y1, 35000, RATE);
-const freeHigher = S.taxFreeBalance(Y1, 60000, RATE);
-const pb = PB.simulate(25000);
-const pbEq = S.grossEquivalentRate(Y2, 60000, 25000, pb.median);
-const nSrc = Object.keys(P.sources).length;
+const { P, PAY, PEN, m, pc } = h;
+const E = P.afc.england, S = P.afc.scotland, N = P.afc.ni, TE = P.teachers.england, TW = P.teachers.wales;
+const b5 = PAY.afcPay('england', '5', 0), r5 = h.nhsNet('england', b5);
+const m1 = PAY.teacherEngland('M1'), rm1 = h.teacherNet('england', m1);
+const b5in = b5 + PAY.hcas(b5, 'inner');
+const ladder = PAY.BANDS.map((b) => {
+  const e = PAY.afcPoints('england', b), s = PAY.afcPoints('scotland', b);
+  return [`Band ${b}`, `${m(e[0].pay)} to ${m(e.at(-1)!.pay)}`, `${m(h.nhsNet('england', e[0].pay).monthly)} to ${m(h.nhsNet('england', e.at(-1)!.pay).monthly)}`, `${m(h.nhsNet('scotland', s[0].pay).monthly)} to ${m(h.nhsNet('scotland', s.at(-1)!.pay).monthly)}`];
+});
+const teach = PAY.EN_POINTS.map((p) => { const a = PAY.teacherEngland(p), c = PAY.teacherEngland(p, 3); return [p, m(a), m(h.teacherNet('england', a).monthly), m(c), m(h.teacherNet('england', c).monthly)]; });
+const steps = [
+  ['Pension', `${pc(r5.pensionRate)} of pay, ${m(r5.pension)} a year`, 'Before income tax'],
+  ['Income tax', `${m(r5.tax)} a year`, 'On pay after pension, above the Personal Allowance'],
+  ['National Insurance', `${m(r5.ni)} a year`, 'On pay before pension'],
+  ['Take-home', `${m(r5.net)} a year, ${m(r5.monthly)} a month`, 'No student loan in this example'],
+];
+const proj = (s: 'nhsEW' | 'tps', pay: number) => PEN.project({ scheme: s, pay, age: 30, retireAge: 67 }).pension;
+const pending = [
+  ['NHS Agenda for Change, Northern Ireland, 2026/27', `${pc(N.next.committedAward)} committed on ${displayDate(N.next.statement, 'en-GB')}; circular not issued`, 'Still to come'],
+  ['Teachers, Wales, from 1 September 2026', `${pc(TW.next.award)} announced on ${displayDate(TW.next.announced, 'en-GB')}; revised Welsh document due`, 'Still to come'],
+  ['Teachers, Northern Ireland, from 1 September 2026', 'No award published', 'Still to come'],
+  ['Teachers, England, from 1 September 2027', `${pc(TE.awardSep2027)} on every range, already in the 2026 pay document`, 'Set'],
+  ['NHS Agenda for Change, England, 2027/28', 'Awaits the next pay review body report', 'Not known'],
+];
 const faqs = [
-  { q: 'Is a cash ISA worth it if I pay no tax on my interest?', a: `Not for the tax, today. A basic rate taxpayer can earn ${m(A.psa.basic)} of interest tax free, which at ${pc(RATE, 0)} covers about ${m(freeBasic)} of savings. A cash ISA still keeps future interest out of tax if rates, balances or your income rise, and the 2027/28 rates make every taxable pound above the allowance cost more. If a taxable account pays clearly more than the best cash ISA, it can be the better home for money under that level.` },
-  { q: 'What is the ISA allowance for 2026/27 and 2027/28?', a: `${m(A.isa.overall)} in each year, split as you like between cash, stocks and shares, innovative finance and a Lifetime ISA, which takes ${m(A.isa.lisa)} at most. From 6 April 2027 no more than ${m(B.isa.cashUnder65)} of it can go into cash ISAs if you are 64 or under on 5 April 2028; savers aged 65 or over keep ${m(B.isa.cashFrom65)} in cash. The Budget of November 2025 froze the overall limits until April 2031.` },
-  { q: 'Do I lose my ISA if the cash limit falls to £12,000?', a: `No. Money already in a cash ISA stays there and stays tax free; the new limit only caps what you pay in during a tax year. What changes for under-65s is that transfers from a stocks and shares ISA into a cash ISA will be refused, and cash left inside an investment ISA will bear a ${pc(B.cashInvestmentIsaCharge, 0)} charge on its interest.` },
-  { q: 'How much tax will I pay on savings interest from April 2027?', a: `Only on interest above your allowances, at ${pc(B.savingsRates.basic, 0)}, ${pc(B.savingsRates.higher, 0)} or ${pc(B.savingsRates.additional, 0)} instead of 20, 40 or 45 %. The Personal Allowance, the ${m(A.startingRateLimit)} starting rate and the Personal Savings Allowance are unchanged, so a saver who pays nothing now still pays nothing. Someone on ${m(52000)} with ${m(50000)} at ${pc(RATE, 0)} goes from ${m2(ex[0].taxable.tax)} to ${m2(ex[1].taxable.tax)}.` },
-  { q: 'Are Premium Bonds better than a savings account?', a: `It depends on your tax band and on luck. Prizes are tax free and the prize fund rate is ${pc(P.premiumBonds.rate, 2)}, but that is an average pulled up by rare large prizes. On ${m(25000)} the median holder wins about ${m(pb.median)} a year. For a higher rate taxpayer that equals a taxable account paying ${pc(pbEq, 2)} in 2027/28; a basic rate taxpayer needs much less, so for most people a good account wins.` },
-  { q: 'Does this calculator work for Scotland?', a: 'Yes. Savings interest is taxed at UK rates and on UK bands even for Scottish taxpayers, and the Personal Savings Allowance follows the UK higher rate threshold, so the tax on your interest is the same as elsewhere. The only Scottish part is the extra tax on wages when interest tapers the Personal Allowance above £100,000; choose Scotland under "More" for that.' },
+  { q: 'How much does a band 5 take home a month in 2026/27?', a: `In England, band 5 runs from ${m(b5)} to ${m(PAY.afcPay('england', '5', 2))}. Full time, outside London and with no student loan, that leaves about ${m(r5.monthly)} to ${m(h.nhsNet('england', PAY.afcPay('england', '5', 2)).monthly)} a month after the NHS pension, income tax and NI. In inner London the supplement lifts the entry point to ${m(b5in)} a year before deductions.` },
+  { q: 'What is the teacher starting salary in 2026?', a: `M1 is ${m(m1)} outside London from 1 September 2026, rising to ${m(PAY.teacherEngland('M1', 3))} in inner London, under the School Teachers’ Pay and Conditions Document 2026 published on ${displayDate(TE.stpcdPublished, 'en-GB')}. After the Teachers’ Pension, tax and NI, M1 outside London leaves about ${m(rm1.monthly)} a month with no student loan.` },
+  { q: 'Is the NHS pension worth more than the teachers’ pension?', a: `Close to equal. The NHS 2015 scheme adds 1/${h.num(P.pension.nhsEW.accrual)} of pay a year and revalues at CPI plus ${pc(P.pension.nhsEW.realRevaluation)}; the teachers’ scheme adds 1/${h.num(P.pension.tps.accrual)} and revalues at CPI plus ${pc(P.pension.tps.realRevaluation)}. On ${m(45000)} from age 30 to 67, that projects to about ${m(proj('nhsEW', 45000))} and ${m(proj('tps', 45000))} a year in today’s money.` },
+  { q: 'When is the next NHS pay rise?', a: `NHS awards take effect on 1 April. The ${E.year} award in England was ${pc(E.award)} and Scotland’s ${pc(S.award)}; Wales applied its own scale from the same date. The 2027/28 award depends on the next NHS Pay Review Body report and each government’s response, so no figure exists yet. In Northern Ireland, the 2026/27 award itself is still to come.` },
+  { q: 'Do NHS staff in Scotland take home more than in England?', a: `Usually a little more, but less than the gross gap suggests. Band 5 entry is ${m(PAY.afcPay('scotland', '5', 0))} in Scotland and ${m(b5)} in England, which leaves about ${m(h.nhsNet('scotland', PAY.afcPay('scotland', '5', 0)).monthly)} and ${m(r5.monthly)} a month. Scottish income tax and a different pension tier table take back part of the higher Scottish pay.` },
+  { q: 'Is the London supplement included in the take-home figures?', a: `Only when you choose a London area in the calculator. The NHS High Cost Area Supplement is ${pc(E.hcas.inner.rate, 0)} of basic pay in inner London, ${pc(E.hcas.outer.rate, 0)} in outer London and ${pc(E.hcas.fringe.rate, 0)} in the fringe, each within a minimum and maximum, and it is pensionable. Teachers in London are paid on separate London pay ranges instead.` },
+  { q: 'Why is my take-home lower than a simple tax calculator says?', a: 'Most general calculators ignore the NHS or teachers’ pension, or apply it after tax. The contribution is taken first, at your tier rate on all of your pay, which lowers income tax but not National Insurance or a student loan. Scottish taxpayers also pay the Scottish rates. This site applies each step in that order for your own band or point.' },
 ];
-const jsonLd = [webApplicationSchema({ name: 'ISA or taxable account calculator 2026/27 and 2027/28', description: 'Tax on savings interest in a taxable account against a cash ISA, by income, for 2026/27 and 2027/28.', path: route('home', lang), lang }), websiteSchema(lang), organizationSchema(lang), faqSchema(faqs, lang)];
-const groups = GROUPS_ORDER.map((g) => ({ g, pages: PAGES.filter((p) => p.group === g) })).filter((x) => x.pages.length);
-const timeline = [
-  { d: P.reform.budget, t: 'Budget: cash ISA limit of £12,000 for under-65s and savings rates up 2 points, both from April 2027, announced.' },
-  { d: P.reform.financeActAssent, t: 'Finance Act 2026 receives Royal Assent: savings rates of 22, 42 and 47 % for 2027/28 become law.' },
-  { d: P.ftbIsa.consultationOpened, t: 'Consultation on a First Time Buyer ISA to replace the Lifetime ISA for new savers; it closed on 18 August 2026.' },
-  { d: P.reform.isaRegsMade, t: 'ISA (Amendment) (No. 2) Regulations 2026 made: the £12,000 cash limit, the transfer ban and the charge on cash in investment ISAs.' },
-  { d: P.reform.inForce, t: 'Both changes take effect on the first day of the 2027/28 tax year.' },
-];
+const jsonLd = [webApplicationSchema({ name: 'NHS and teacher pay calculator 2026/27', description: 'Take-home pay for every Agenda for Change band and teacher pay point in the four UK nations, with NHS and teachers’ pension estimates.', path: route('home', lang), lang }), websiteSchema(lang), organizationSchema(lang), faqSchema(faqs, lang)];
+const groups = GROUPS_ORDER.map((g) => ({ g, pages: PAGES.filter((p) => p.group === g).sort((a, b) => a.order - b.order) })).filter((x) => x.pages.length);
+const nSrc = Object.keys(P.sources).length;
 ---
-<PageLayout title="ISA or Savings Account 2026/27: Tax on Interest and 2027/28" description="ISA or taxable savings account? The tax on your interest for your income in 2026/27 and at the 22/42/47 % rates of 2027/28, with the £12,000 cash ISA limit." lang={lang} jsonLd={jsonLd} faqs={faqs}>
+<PageLayout title="NHS and Teacher Pay 2026/27: Pay Scales and Take-Home Pay" description="NHS and teacher pay 2026/27: every Agenda for Change band and teacher pay point in the four UK nations, take-home after pension, tax and NI, and pensions." lang={lang} jsonLd={jsonLd} faqs={faqs}>
   <header class="mb-3">
-    <h1 class="text-[1.75rem] font-bold text-navy-900 max-sm:leading-tight sm:text-3xl md:text-4xl">ISA or taxable account: the tax on your interest, 2026/27 and 2027/28</h1>
-    <p class="mt-2 text-base text-navy-700 sm:text-lg">Enter your income, your savings and the rate. You get the tax you would pay on that interest outside an ISA this year and from 6 April 2027, line by line.</p>
+    <h1 class="text-[1.75rem] font-bold text-navy-900 max-sm:leading-tight sm:text-3xl md:text-4xl">NHS and teacher pay 2026/27: what reaches your account</h1>
+    <p class="mt-2 text-base text-navy-700 sm:text-lg">Choose your band and step. The calculator takes off the NHS pension at your tier, income tax, National Insurance and any student loan, in that order. Teachers will find their scale further down and a calculator of their own.</p>
   </header>
-  <div data-outil class="mb-4"><Tool tool={{ kind: 'isa', props: { income: 52000, balance: 50000, rate: 4 } }} primary={true} /></div>
-  <p class="mb-8 text-sm text-navy-600">Rules of {P.taxYear} and {P.nextTaxYear} as set by the Finance Act 2026 and SI 2026/1018 · last updated <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-GB')}</time> · {AUTHOR_NAME} · <a href={route('method', lang)} class="underline hover:text-navy-900">How the sums are done</a> · <a href={route('about', lang)} class="underline hover:text-navy-900">About this site</a></p>
+  <div data-outil class="mb-4"><Tool tool={{ kind: 'nhs', props: { band: '5' } }} primary={true} /></div>
+  <p class="mb-8 text-sm text-navy-600">NHS scales of {E.year}, teacher scales from September 2026, tax year {P.afc.england.year} · last updated <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-GB')}</time> · {AUTHOR_NAME} · <a href={route('method', lang)} class="underline hover:text-navy-900">How the figures are worked out</a> · <a href={route('about', lang)} class="underline hover:text-navy-900">About</a></p>
 
   <div class="prose prose-slate max-w-none">
-    <p>This site does better than the first Google result, GOV.UK's page on Individual Savings Accounts, which gives the {m(A.isa.overall)} allowance for {Y1} but no figure for the tax an ISA saves, because it works out that tax for your own income: the same balance at the same rate in a taxable account and in an ISA, with the Personal Allowance, the {m(A.startingRateLimit)} starting rate for savings and the Personal Savings Allowance applied in the order the law sets, for {Y1} and again for {Y2}, when the savings rates rise to {pc(B.savingsRates.basic, 0)}, {pc(B.savingsRates.higher, 0)} and {pc(B.savingsRates.additional, 0)} and the cash ISA limit falls to {m(B.isa.cashUnder65)} for savers under 65. Banks and platforms explain the allowance; none of the pages that rank shows what the ISA is worth to a particular saver. Nothing is sold here and no account is ranked: the only number that matters is your own.</p>
+    <p>This site does better than the first Google result because the NHS Employers page of {displayDate(E.published, 'en-GB')} gives only the gross 2026/27 salaries, while this site starts from the same scale and works out, for every band and every step, the real take-home after income tax (Scottish rates included), National Insurance, the tiered pension contribution and a student loan, with the London supplement and the scales of all four nations, and then estimates the NHS or teachers’ pension at retirement, which no page in the top ten does.</p>
+    <p>Two groups of public sector workers are covered here because their questions are the same: what is my band or point worth this year, what will I actually be paid, and what pension am I building. NHS staff on Agenda for Change, from healthcare assistants to senior managers, are paid on a national scale of nine bands that changes each April. School teachers are paid on pay ranges that change each September and differ between England, Scotland, Wales and Northern Ireland. Both pay a tiered pension contribution before tax, which general salary calculators usually get wrong. Each figure on the site comes from the published scale or circular, with its date, and the calculators apply the 2026/27 tax rates of HMRC and the Scottish Government.</p>
   </div>
 
-  <section class="not-prose my-10" aria-labelledby="grid-title">
-    <h2 id="grid-title" class="text-2xl font-bold text-navy-900">What an ISA saves a year, by income and balance</h2>
-    <p class="mt-2 max-w-3xl text-navy-700">Tax you would pay on the interest in a taxable account, which is what a cash ISA saves you. Interest at {pc(RATE, 0)} a year, no other savings, rest of the UK. Two figures per balance: {Y1}, then {Y2}.</p>
-    <Fragment set:html={h.table(['Income before tax', ...balances.flatMap((b) => [`${m(b)} · ${Y1}`, `${m(b)} · ${Y2}`])], grid, undefined, ['l', 'r', 'r', 'r', 'r', 'r', 'r'])} />
+  <section class="not-prose my-10" aria-labelledby="keys-title">
+    <h2 id="keys-title" class="text-2xl font-bold text-navy-900">Six figures to start with</h2>
+    <dl class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="border-l-4 border-accent-500 pl-4"><dt class="text-sm text-navy-600">Band 5 entry, England</dt><dd class="text-xl font-semibold text-navy-900">{m(b5)}</dd><dd class="text-sm text-navy-700">{m(r5.monthly)} a month take-home</dd></div>
+      <div class="border-l-4 border-accent-500 pl-4"><dt class="text-sm text-navy-600">Teacher M1, England outside London</dt><dd class="text-xl font-semibold text-navy-900">{m(m1)}</dd><dd class="text-sm text-navy-700">{m(rm1.monthly)} a month take-home</dd></div>
+      <div class="border-l-4 border-accent-500 pl-4"><dt class="text-sm text-navy-600">NHS award, England, from 1 April 2026</dt><dd class="text-xl font-semibold text-navy-900">{pc(E.award)}</dd><dd class="text-sm text-navy-700">Scotland {pc(S.award)}, Northern Ireland still to come</dd></div>
+      <div class="border-l-4 border-accent-500 pl-4"><dt class="text-sm text-navy-600">Teacher award, England</dt><dd class="text-xl font-semibold text-navy-900">{pc(TE.awardSep2026)} then {pc(TE.awardSep2027)}</dd><dd class="text-sm text-navy-700">September 2026, then September 2027</dd></div>
+      <div class="border-l-4 border-accent-500 pl-4"><dt class="text-sm text-navy-600">Inner London supplement, NHS</dt><dd class="text-xl font-semibold text-navy-900">{pc(E.hcas.inner.rate, 0)} of basic pay</dd><dd class="text-sm text-navy-700">between {m(E.hcas.inner.min)} and {m(E.hcas.inner.max)} a year</dd></div>
+      <div class="border-l-4 border-accent-500 pl-4"><dt class="text-sm text-navy-600">Pension built each year</dt><dd class="text-xl font-semibold text-navy-900">1/{h.num(P.pension.nhsEW.accrual)} or 1/{h.num(P.pension.tps.accrual)} of pay</dd><dd class="text-sm text-navy-700">NHS 2015 scheme or teachers’ scheme</dd></div>
+    </dl>
+  </section>
+
+  <section class="not-prose my-10" aria-labelledby="ladder-title">
+    <h2 id="ladder-title" class="text-2xl font-bold text-navy-900">Take-home on every band, England and Scotland</h2>
+    <p class="mt-2 max-w-3xl text-navy-700">Monthly take-home from the first to the last point of each band, full time, outside London, with the NHS pension of each nation and no student loan. Scotland uses its own scale and the Scottish income tax rates.</p>
+    <Fragment set:html={h.table(['Band', 'England pay, 2026/27', 'England, a month', 'Scotland, a month'], ladder, undefined, ['l', 'r', 'r', 'r'])} />
   </section>
 
   <div class="prose prose-slate max-w-none">
-    <h2>Four layers of tax-free interest, in a fixed order</h2>
-    <p>Most savers in the UK pay no tax on their interest, and the reason is not one allowance but four, applied one after the other. The calculator follows the order of the Income Tax Act 2007, because the order changes the answer.</p>
-    <ol>
-      <li><strong>What is left of your Personal Allowance.</strong> {m(A.personalAllowance)}, used first by wages and pensions. Only people whose other income is below it have any left for interest.</li>
-      <li><strong>The starting rate for savings.</strong> Up to {m(A.startingRateLimit)} of interest at 0 %, but only inside the lowest {m(A.startingRateLimit)} of taxable income. Each pound of other income above the Personal Allowance removes a pound of it, so it disappears at {m(A.personalAllowance + A.startingRateLimit)} of income. Frozen at {m(A.startingRateLimit)} until 2030/31 by section 9 of the Finance Act 2026.</li>
-      <li><strong>The Personal Savings Allowance.</strong> {m(A.psa.basic)} if your total income stays in the basic rate band, {m(A.psa.higher)} if it reaches the higher rate, nothing at the additional rate. The interest itself counts when your band is decided.</li>
-      <li><strong>The rate of your band.</strong> {pc(A.savingsRates.basic, 0)}, {pc(A.savingsRates.higher, 0)} or {pc(A.savingsRates.additional, 0)} in {Y1}; {pc(B.savingsRates.basic, 0)}, {pc(B.savingsRates.higher, 0)} or {pc(B.savingsRates.additional, 0)} in {Y2}.</li>
-    </ol>
-    <p>Two examples show how far apart savers are. A retired saver with {m(16000)} of pension and {m(100000)} earning {pc(RATE, 0)} pays {m2(pensioner.tax)} on {m(100000 * RATE)} of interest, because the starting rate and the allowance absorb most of it. A worker on {m(52000)} with half that balance pays {m2(ex[0].taxable.tax)} this year and {m2(ex[1].taxable.tax)} in {Y2}: the interest pushes the total over the higher rate threshold, which halves the allowance. At {pc(RATE, 0)}, a basic rate taxpayer can hold about {m(freeBasic)} in taxable accounts before paying anything, a higher rate taxpayer about {m(freeHigher)}.</p>
+    <h2>How take-home is worked out, step by step</h2>
+    <p>The same four steps apply to every NHS and teaching salary, and their order matters. Take a band 5 at the entry point in England, {m(b5)} a year.</p>
+  </div>
+  <div class="not-prose my-4"><Fragment set:html={h.table(['Step', 'Amount', 'Worked on'], steps, `Band 5 entry, England ${E.year}, full time, outside London.`, ['l', 'r', 'l'])} /></div>
+  <div class="prose prose-slate max-w-none">
+    <p>The pension comes first. NHS and teachers’ pension contributions are taken from gross pay before income tax under what HMRC calls the net pay arrangement, so the relief is automatic at your top rate. The rate is set by tier: your pensionable pay places you in one tier, and that tier’s rate applies to all of it. A pay rise that crosses a boundary can therefore raise the contribution on the whole salary. Part-time staff and teachers are placed in a tier by the pay they actually earn, which often puts them in a lower one.</p>
+    <p>Income tax comes next, on what is left above the Personal Allowance of {m(P.tax.personalAllowance)}. In England, Wales and Northern Ireland the rates are 20 %, 40 % and 45 %. Scottish taxpayers pay six rates, from 19 % to 48 %, and most NHS and teaching salaries in Scotland reach the 21 % intermediate rate. Above {m(P.tax.taperThreshold)} the Personal Allowance is withdrawn, which affects the top of band 8d, band 9 and senior school leaders.</p>
+    <p>National Insurance is charged at 8 % between {m(P.tax.ni.primaryThreshold)} and {m(P.tax.ni.upperEarningsLimit)} a year and 2 % above, on pay before the pension. A student loan, if you have one, takes 9 % above its plan threshold, also on pay before the pension. That is why a higher pension tier lowers your tax bill but leaves the NI and loan lines unchanged. The <a href={route('nhs-take-home-pay', lang)}>NHS take-home page</a> and the <a href={route('teacher-take-home-pay', lang)}>teacher take-home page</a> show every line for any post.</p>
+    <h2>London: two different systems</h2>
+    <p>The NHS and schools pay London differently. NHS staff keep the national scale and receive a High Cost Area Supplement on top: a percentage of basic pay with a minimum and a maximum, in three zones. For a band 5 at entry in inner London the supplement brings pay to {m(b5in)}, and it is pensionable. Teachers instead have whole separate pay ranges for inner London, outer London and the fringe, so M1 is {m(PAY.teacherEngland('M1', 3))} in inner London against {m(m1)} elsewhere. The <a href={route('nhs-london-weighting-hcas', lang)}>HCAS page</a> and the <a href={route('london-teacher-pay', lang)}>London teacher page</a> compare the two.</p>
   </div>
 
-  <section class="not-prose my-10" aria-labelledby="tl-title">
-    <h2 id="tl-title" class="text-2xl font-bold text-navy-900">The road to 6 April 2027</h2>
-    <ol class="mt-4 space-y-3 border-l-2 border-accent-500 pl-5">
-      {timeline.map((x) => <li><p class="text-sm font-semibold text-accent-700"><time datetime={x.d}>{displayDate(x.d, 'en-GB')}</time></p><p class="text-navy-800">{x.t}</p></li>)}
-    </ol>
+  <section class="not-prose my-10" aria-labelledby="teach-title">
+    <h2 id="teach-title" class="text-2xl font-bold text-navy-900">Teachers in England, M1 to U3</h2>
+    <p class="mt-2 max-w-3xl text-navy-700">From 1 September 2026, School Teachers’ Pay and Conditions Document 2026. Take-home a month, full time, Teachers’ Pension at the tier for the salary, no student loan.</p>
+    <Fragment set:html={h.table(['Point', 'Rest of England', 'A month', 'Inner London', 'A month'], teach, undefined, ['l', 'r', 'r', 'r', 'r'])} />
   </section>
 
   <div class="prose prose-slate max-w-none">
-    <h2>What is already law, and what is still to come</h2>
-    <p>Everything the calculator uses for {Y2} is in force law that starts on 6 April 2027: the savings rates are in section 5 of the <Fragment set:html={h.src('leg_fa26_s5', 'Finance Act 2026')} />, the frozen Personal Allowance and basic rate band in section 10, and the ISA changes in <Fragment set:html={h.src('leg_si_1018', 'the Individual Savings Account (Amendment) (No. 2) Regulations 2026')} />, made on {h.date(P.reform.isaRegsMade)} and laid before Parliament on {h.date(P.reform.isaRegsLaid)}. Two things are not settled. The main rates of income tax on wages for {Y2} will be set by next year's Finance Act; they only matter here for someone whose interest tapers their Personal Allowance, and the calculator says when it uses this year's rates for that. The Scottish rates for {Y2} will be set in the Scottish Budget, expected early in 2027. And the First Time Buyer ISA has been consulted on but has no launch date or price cap yet; until it opens, the Lifetime ISA stays open on its current rules.</p>
-    <p>The ISA changes are detailed on the <Fragment set:html={h.a('cash-isa-changes', 'cash ISA changes page')} />, with the age test on the <Fragment set:html={h.a('isa-over-65', 'page for savers aged 65 and over')} />. The rates are on the <Fragment set:html={h.a('savings-tax-rates-2027', '2027/28 savings tax page')} />.</p>
+    <p>Teachers in England received a two-year award: {pc(TE.awardSep2026)} from September 2026 and {pc(TE.awardSep2027)} from September 2027, both written into the pay document. In Scotland, the SNCT salary tables changed on 1 August 2026, and the main grade now runs from {m(P.teachers.scotland.main[0])} for a probationer to {m(P.teachers.scotland.main[5])}. Wales has announced {pc(TW.next.award)} for September 2026 but had not yet published its new scale on 20 October 2026, and Northern Ireland is still on its September 2025 scale. The <a href={route('teacher-pay-scales', lang)}>teacher pay scales page</a> lists every pay area, and each nation has its own page.</p>
+    <h2>The two pensions</h2>
+    <p>Both pensions are career average schemes with a normal pension age equal to your State Pension age, or 65 if that is higher. The NHS Pension Scheme 2015 adds one fifty-fourth of each year’s pensionable pay to your pension and revalues the total by CPI plus {pc(P.pension.nhsEW.realRevaluation)} each April while you work; the revaluation in April 2026 was {pc(P.pension.nhsEW.revaluationApril2026)}. The Teachers’ Pension Scheme adds one fifty-seventh and revalues by CPI plus {pc(P.pension.tps.realRevaluation)}, {pc(P.pension.tps.revaluationApril2026)} in 2026. Because the revaluation beats inflation, the pension can be shown in today’s money: someone earning {m(45000)} from age 30 to 67, with pay flat in real terms, builds about {m(proj('nhsEW', 45000))} a year in the NHS scheme and {m(proj('tps', 45000))} in the teachers’ scheme. In both, each £1 a year of pension can be exchanged for £{h.num(P.pension.tps.commutation)} of tax-free lump sum at retirement.</p>
+    <p>The <a href={route('nhs-pension-calculator', lang)}>NHS pension calculator</a> and the <a href={route('teachers-pension-calculator', lang)}>teachers’ pension calculator</a> project the pension year by year from your pay and age, add what you have already built from your statement, and show the lump sum trade. They do not model early retirement reductions or the annual allowance, which the method page explains.</p>
+  </div>
 
-    <h2>Premium Bonds, by the same arithmetic</h2>
-    <p>Premium Bonds pay no interest. Each £1 Bond has a 1 in {h.num(P.premiumBonds.odds)} chance a month of a tax-free prize, and the prizes add up to a prize fund rate of {pc(P.premiumBonds.rate, 2)} as published by NS&amp;I for the {P.premiumBonds.drawMonth} draw. That is an average: two £1 million prizes a month pull it up, and most holders get less. Simulating {h.num(4000)} years of draws on the October 2026 prize table, {m(25000)} of Bonds wins a median of {m(pb.median)} a year against an average of {m(pb.mean)}. The <Fragment set:html={h.a('premium-bonds-calculator', 'Premium Bonds calculator')} /> sets this against a taxable account after tax for your income, and the <Fragment set:html={h.a('premium-bonds-odds', 'odds page')} /> gives the chances month by month.</p>
+  <section class="not-prose my-10" aria-labelledby="pending-title">
+    <h2 id="pending-title" class="text-2xl font-bold text-navy-900">Awards still to come</h2>
+    <p class="mt-2 max-w-3xl text-navy-700">A figure appears on this site only once it is published. Position on {displayDate(LAST_UPDATED, 'en-GB')}:</p>
+    <Fragment set:html={h.table(['Award', 'What is known', 'Status'], pending, undefined, ['l', 'l', 'l'])} />
+  </section>
 
+  <div class="prose prose-slate max-w-none">
     <h2>Where the figures come from</h2>
-    <p>Rates, bands and allowances come from legislation.gov.uk and GOV.UK: the <Fragment set:html={h.src('leg_ita_12a', 'Income Tax Act 2007')} /> as amended, the Finance Act 2026, the ISA regulations and HMRC's <Fragment set:html={h.src('gov_savings_free', 'guidance on tax-free interest')} />. Prizes come from NS&amp;I's <Fragment set:html={h.src('nsi_alloc', 'monthly prize allocation')} />. The parameter file cites {nSrc} official pages, each read on {h.date(P.retrieved_at)}, and the engine is tested against GOV.UK's own worked examples. The <a href={route('method', lang)}>method page</a> lists every rule and what is left out; the <a href={route('about', lang)}>about page</a> says who publishes the site and how to report an error.</p>
-    <p>What the calculator does not do: dividends, foreign interest, the Marriage Allowance and the Blind Person's Allowance are left out, and it assumes interest is paid in the year you choose. It never sees your accounts and nothing you type leaves your browser. It is not advice and it recommends no provider.</p>
+    <p>NHS pay comes from the <Fragment set:html={h.src('nhse_afc', 'NHS Employers 2026/27 pay scales')} />, the Welsh pay letter AfC(W) 02/2026, the Scottish Government’s <Fragment set:html={h.src('scot_afc', 'Agenda for Change pay page')} /> and the Department of Health circular for Northern Ireland. Teacher pay comes from the <Fragment set:html={h.src('stpcd26', 'School Teachers’ Pay and Conditions Document 2026')} />, the SNCT salary tables, the Welsh pay document and the Northern Ireland determination. Pension tiers come from <Fragment set:html={h.src('nhsbsa_tiers', 'NHSBSA')} />, Teachers’ Pensions, the SPPA, the HSC Pension Service and the Department of Education in Belfast; tax, NI and student loan thresholds from <Fragment set:html={h.src('hmrc_rates', 'HMRC’s rates for 2026 to 2027')} />. In all, {nSrc} official pages and documents, each listed with its date on the pages that use it.</p>
+    <p>What the site does not do: it cannot see your payslip, your tax code or your pension record, it does not model salary sacrifice schemes, on-call payments or bank shifts, and it gives no advice. Nothing you type leaves your browser. For your own pension, your NHSBSA Total Reward Statement or your Teachers’ Pensions account remains the reference.</p>
   </div>
 
   <section class="mt-12" aria-labelledby="guides-title">
-    <h2 id="guides-title" class="text-2xl font-bold text-navy-900">Every calculator and guide</h2>
+    <h2 id="guides-title" class="text-2xl font-bold text-navy-900">All calculators and pay pages</h2>
     <div class="mt-4 grid gap-x-10 gap-y-6 md:grid-cols-2">
       {groups.map(({ g, pages }) => (
         <div>

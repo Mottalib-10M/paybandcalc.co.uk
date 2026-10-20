@@ -5,16 +5,16 @@ import { CONTACT_EMAIL, LAST_UPDATED, SITE_NAMES } from '../../data/site-config'
 import { route } from '../../i18n/routes';
 const lang = 'en';
 ---
-<PageLayout title={`Contact ${SITE_NAMES[lang]}: a figure, a savings tax rule, the widget`} description="Write to ISA Sums when a savings tax figure differs from your HMRC calculation, when an ISA or Premium Bonds rule is missing or out of date, or to embed the calculator on your site." lang={lang} noindex={true} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+<PageLayout title={`Contact ${SITE_NAMES[lang]}: a pay figure, a pension rule, the widget`} description="Write to Pay Band Calc when a take-home figure differs from your payslip, when a pay scale or pension tier is out of date, or to embed the NHS pay calculator on your site." lang={lang} noindex={true} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
   <div class="prose prose-slate max-w-none">
     <h1>Contact</h1>
     <p>Email: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. A person reads every message.</p>
-    <h2>Our figure differs from HMRC's</h2>
-    <p>Tell us the tax year, your income before tax, the interest your bank reported and the figure in HMRC's letter or tax code notice. The usual reasons for a gap are interest you forgot (a second account, a joint account split in two, a bond that matured), a tax code that collects an estimate rather than the final figure, and pension or Gift Aid relief that widens your basic rate band. If an official rule has changed, we update the parameter file, rerun the tests and date the change.</p>
+    <h2>Our figure differs from your payslip</h2>
+    <p>Tell us the nation, your band and step or pay point, your hours, your pension scheme and the line that differs. The usual reasons are a tax code other than the standard one, a part month, unsocial hours or arrears paid in that month, a salary sacrifice scheme, or a pension tier your employer set on different pay. If a published scale or tier table has changed, we update the parameter file, rerun the tests and date the change.</p>
     <h2>What we cannot do</h2>
-    <p>We cannot see your accounts, your ISA subscriptions or your tax record, open or transfer an ISA, or speak to HMRC, NS&amp;I or a bank for you. Please do not send account numbers, your National Insurance number or your address. For your own tax position, HMRC's helpline and your personal tax account are the place to go; for guidance on where to save, MoneyHelper is free and impartial.</p>
+    <p>We cannot see your payslip, your pension record or your tax account, change your pay, or speak to your employer, NHSBSA, Teachers’ Pensions or HMRC for you. Please do not send your National Insurance number, your pension reference or your address. For your own pay, your payroll team is the first stop; for your pension, your Total Reward Statement or your Teachers’ Pensions account; for tax, your HMRC personal tax account.</p>
     <h2>Using the calculator on your own site</h2>
-    <p>Credit unions, money guidance charities, pensioners' groups and personal finance writers can show the ISA against taxable account calculator in an iframe at no cost. The code and the conditions are on the <a href={route('widget', lang)}>embed page</a>.</p>
+    <p>Union branches, staff networks and careers advisers can show the NHS take-home calculator in an iframe at no cost. The code and the conditions are on the <a href={route('widget', lang)}>embed page</a>.</p>
     <h2>Publisher</h2>
     <LegalIdentity lang={lang} />
     <p>Updated: {LAST_UPDATED}.</p>

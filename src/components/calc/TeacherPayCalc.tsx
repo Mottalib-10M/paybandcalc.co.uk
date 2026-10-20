@@ -84,13 +84,13 @@ export default function TeacherPayCalc({ nation: n0 = 'england', point: p0 = 'M1
             <SelectField id={id('area')} label="Pay area" value={String(area)} onChange={(v) => setArea(Number(v) as TeacherArea)} options={TEACHER_AREA_LABEL.map((l, i) => ({ value: String(i), label: l }))} help={nation === 'england' ? 'London and fringe have their own scales' : 'England only'} />
             <SelectField id={id('year')} label="Scale" value={year} onChange={(v) => setYear(v as EnYear)} options={[{ value: 'sep2026', label: 'September 2026' }, { value: 'sep2027', label: 'September 2027' }]} help={nation === 'england' ? 'Both awards are already accepted' : 'England only'} />
           </div>
+          <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:gap-y-0">
+            <NumberField id={id('tlr')} label="Allowances a year (TLR, SEN)" value={allow} onChange={setAllow} unit="£" max={100000} help="Full-time value" />
+            <NumberField id={id('fte')} label="Share of a full-time timetable" value={fte} onChange={setFte} unit="%" max={100} help="100 % = full time" />
+          </div>
           <details className="group border-t border-navy-200 pt-3">
-            <summary className="cursor-pointer text-sm font-medium text-accent-700">More: TLR or SEN allowance, hours, student loan, pension</summary>
+            <summary className="cursor-pointer text-sm font-medium text-accent-700">More: student loan, where you pay tax, pension membership</summary>
             <div className="mt-3 grid gap-4">
-              <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:gap-y-0">
-                <NumberField id={id('tlr')} label="Allowances a year (TLR, SEN)" value={allow} onChange={setAllow} unit="£" max={100000} help="Full-time value" />
-                <NumberField id={id('fte')} label="Share of a full-time timetable" value={fte} onChange={setFte} unit="%" max={100} help="100 % = full time" />
-              </div>
               <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:gap-y-0">
                 <SelectField id={id('loan')} label="Student loan" value={loan} onChange={setLoan} options={LOAN_OPTS} />
                 <SelectField id={id('tax')} label="Where you pay income tax" value={tax} onChange={setTax} options={TAX_OPTS} />

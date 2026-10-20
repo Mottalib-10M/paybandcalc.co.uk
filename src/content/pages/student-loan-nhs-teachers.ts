@@ -6,7 +6,7 @@ export default definePage({
   order: 83,
   tool: { kind: 'mini:loan', props: { pay: 34000, plan: 3 } },
   related: ['nhs-take-home-pay', 'teacher-take-home-pay', 'ect-teacher-salary', 'nhs-band-5-salary'],
-  sources: ['hmrc_rates'],
+  sources: ['hmrc_rates', 'gov_relief'],
   slug: 'student-loan-nhs-teachers',
   nav: 'Student loan repayments',
   card: 'Plan 1, 2, 4, 5 and postgraduate thresholds for 2026/27 and what each takes from NHS and teaching pay.',

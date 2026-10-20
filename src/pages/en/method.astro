@@ -8,60 +8,46 @@ import { P } from '../../lib/engine/params';
 import { helpers } from '../../lib/helpers';
 const lang = 'en';
 const h = helpers();
-const { m, m2, pc, S, PB, I, Y1, Y2 } = h;
-const A = h.y(Y1), B = h.y(Y2);
-const e1 = S.interestTax(Y1, 16000, 200);
-const e2 = S.interestTax(Y1, 30000, 1300);
-const e3 = S.interestTax(Y1, 110000, 3000);
-const e3b = S.interestTax(Y2, 110000, 3000);
-const lisa = I.lisaCharge(1000);
-const flex = I.flexibleRoom(Y1, 10000, 3000, true), flexNo = I.flexibleRoom(Y1, 10000, 3000, false);
-const spread = PB.simulate(10000);
+const { m, pc, PAY, PEN } = h;
+const E = P.afc.england;
+const ex = h.nhsNet('england', PAY.afcPay('england', '5', 0));
+const hc = PAY.hcas(PAY.afcPay('england', '5', 0), 'inner');
+const T = PEN.tierTable('nhsEW');
 const sources = Object.entries(P.sources) as Array<[string, { url: string; label: { en: string } }]>;
 ---
-<PageLayout title="ISA and Savings Tax Method 2026/27: Rules, Order, Tests" description="How ISA Sums works out savings tax for 2026/27 and 2027/28: the order of allowances, the rates, ISA rules, Premium Bonds odds, the tests and what is left out." lang={lang} jsonLd={[articleSchema({ title: 'How the savings tax and ISA figures are worked out', description: 'Method of ISA Sums', path: route('method', lang), lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'Method', path: route('method', lang) }])]} breadcrumbs={[{ label: 'Method' }]}>
-  <header class="mb-6"><p class="kicker">Method</p><h1 class="mt-1 text-3xl font-bold text-navy-900 md:text-4xl">How the sums are done</h1><p class="mt-3 text-lg text-navy-700">Every figure on the site comes from one tested engine fed by one parameter file. This page lists the rules it applies, in the order it applies them, the checks it passes and what it leaves out. Rules read on <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-GB')}</time>.</p></header>
+<PageLayout title="Pay Band Calc Method: Scales, Tax, Pension Tiers and Tests" description="Pay Band Calc method: how NHS and teacher take-home pay and pensions for 2026/27 are worked out, the order of deductions, pension rules, tests and gaps." lang={lang} jsonLd={[articleSchema({ title: 'How the pay, take-home and pension figures are worked out', description: 'Method of Pay Band Calc', path: route('method', lang), lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'Method', path: route('method', lang) }])]} breadcrumbs={[{ label: 'Method' }]}>
+  <header class="mb-6"><p class="kicker">Method</p><h1 class="mt-1 text-3xl font-bold text-navy-900 md:text-4xl">How the figures are worked out</h1><p class="mt-3 text-lg text-navy-700">Four tested engines (pay, tax, pension and take-home) read one parameter file. This page sets out what each one does, the checks it passes and what it leaves out. Sources read on <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-GB')}</time>.</p></header>
   <div class="prose prose-slate max-w-none">
-    <h2>1. The tax caused by your interest</h2>
-    <p>The calculators never apply a single "rate on savings". They compute your whole income tax twice, once without the interest and once with it, and show the difference. That difference is what an ISA saves, because interest inside an ISA is not income for tax at all. Doing it this way catches the effects that a flat rate misses: interest that pushes you over a threshold, an allowance that halves, a Personal Allowance that tapers.</p>
-    <p>Each computation follows the Income Tax Act 2007:</p>
-    <ol>
-      <li><strong>Personal Allowance</strong> (section 35): {m(A.personalAllowance)}, reduced by £1 for every £2 of adjusted net income above {m(A.taperThreshold)}, rounded up, so it reaches nothing at {m(A.higherRateLimit)}. Adjusted net income here is your income plus interest less gross Gift Aid and relief-at-source pension contributions.</li>
-      <li><strong>Order of income</strong> (section 16): the allowance is set against wages, pensions, profits and rent first; whatever is left covers interest.</li>
-      <li><strong>Starting rate for savings</strong> (section 12): 0 % on savings within the first {m(A.startingRateLimit)} of taxable income. The space is reduced by taxable non-savings income, so it is gone once that income reaches {m(A.startingRateLimit)} above the allowance. The limit is frozen at {m(A.startingRateLimit)} for 2026/27 to 2030/31 (Finance Act 2026, section 9).</li>
-      <li><strong>Personal Savings Allowance</strong> (sections 12A and 12B): a nil rate on the next {m(A.psa.basic)} of savings for a basic rate taxpayer, {m(A.psa.higher)} for a higher rate taxpayer, nothing for an additional rate taxpayer. The band is decided on total taxable income including the interest, using UK bands even for a Scottish taxpayer (section 12B(8)).</li>
-      <li><strong>Savings rates</strong> (section 7 as amended): the rest is placed above non-savings income in the bands, {m(A.basicRateLimit)} for the basic rate and {m(A.higherRateLimit)} for the higher rate limit, both widened by gross Gift Aid and pension contributions. Rates are {pc(A.savingsRates.basic, 0)}, {pc(A.savingsRates.higher, 0)} and {pc(A.savingsRates.additional, 0)} in {Y1} (Finance Act 2026, section 3) and {pc(B.savingsRates.basic, 0)}, {pc(B.savingsRates.higher, 0)} and {pc(B.savingsRates.additional, 0)} in {Y2} (section 5).</li>
-    </ol>
-    <p><strong>Tests against HMRC's own examples.</strong> GOV.UK's page on tax-free interest says that someone with {m(16000)} of wages and {m(200)} of interest has {m(1570)} of starting rate left. Our engine gives {m(e1.startingAvailable)} of starting rate space before the interest, and {m2(e1.tax)} of tax on it. Its other example, a basic rate taxpayer with {m(1300)} of interest, pays tax on {m(300)} at 20 %: the engine gives {m2(e2.tax)}. Both are part of the test suite that runs before each build.</p>
-
-    <h2>2. The taper above £100,000 and the two unknowns of 2027/28</h2>
-    <p>Between {m(A.taperThreshold)} and {m(A.higherRateLimit)}, interest also costs Personal Allowance, which raises the tax on your wages. The calculators show that as a separate line. For someone on {m(110000)} with {m(3000)} of interest it is {m2(e3.knockOn ?? 0)} in {Y1}, on top of {m2(e3.savingsPart)} on the interest itself.</p>
-    <p>Two figures needed for that line in {Y2} are not law yet. The main rates of income tax for {Y2} will be set by next year's Finance Act: the engine uses the {Y1} rates of 20, 40 and 45 % and the page says so whenever this matters (it gives {m2(e3b.tax)} in total for the same example). The Scottish rates for {Y2} will be set by the Scottish Budget: for a Scottish taxpayer in the taper the calculator shows the tax on the interest alone and says that the extra on wages cannot yet be priced. Interest itself is taxed at UK rates in Scotland (section 11D), so the main figure is unaffected. The Scottish rates of {Y1} come from GOV.UK: 19 % to 48 % across six bands.</p>
-
-    <h2>3. ISAs</h2>
+    <h2>1. Pay scales</h2>
     <ul>
-      <li><strong>Allowance</strong>: {m(A.isa.overall)} a year in {Y1} and {Y2}, of which up to {m(A.isa.lisa)} in a Lifetime ISA; Junior ISA {m(P.junior.annual)}. Frozen until {P.reform.limitsFrozenUntil}.</li>
-      <li><strong>Cash limit from 6 April 2027</strong> (SI 2026/1018): {m(B.isa.cashUnder65)} a year into cash ISAs for anyone {P.reform.cashLimitAgeRule}; {m(B.isa.cashFrom65)} from the tax year in which you turn 65. The age test is applied on 5 April, the last day of the tax year.</li>
-      <li><strong>Cash inside an investment ISA</strong>: from 6 April 2027 its interest bears a flat charge at the savings basic rate, {pc(B.cashInvestmentIsaCharge, 0)}, paid by the ISA manager. Transfers from a stocks and shares or innovative finance ISA to a cash ISA are refused for under-65s.</li>
-      <li><strong>Flexible ISAs</strong>: money taken out can be put back in the same tax year without using allowance. GOV.UK's example: {m(10000)} paid in and {m(3000)} withdrawn leaves {m(flex.room)} of room in a flexible ISA, {m(flexNo.room)} in one that is not. The engine reproduces both.</li>
-      <li><strong>Transfers</strong>: {P.transfers.cashDays} working days between cash ISAs, {P.transfers.otherDays} calendar days otherwise.</li>
-      <li><strong>Lifetime ISA</strong>: opened from {P.lisa.openMinAge} to {P.lisa.openBeforeAge - 1}, paid into until {P.lisa.payUntilAge}, bonus of {pc(P.lisa.bonusRate, 0)} up to {m(P.lisa.maxBonus)} a year, withdrawal charge of {pc(P.lisa.withdrawalCharge, 0)} of the amount taken out, home price cap {m(P.lisa.priceCap)}. GOV.UK's example: {m(1000)} withdrawn leaves {m(lisa.received)}, which the tests check.</li>
+      <li><strong>Agenda for Change.</strong> Every band and point of the {E.year} scales for England (NHS Employers, {displayDate(E.published, 'en-GB')}), Wales (pay letter AfC(W) 02/2026) and Scotland (gov.scot, updated {displayDate(P.afc.scotland.updated, 'en-GB')}), and the {P.afc.ni.year} scale for Northern Ireland, the latest published. Each point carries the years before the next one where the scale gives them.</li>
+      <li><strong>High Cost Area Supplement.</strong> A percentage of basic pay, rounded up to the pound, then held between the minimum and maximum of the zone. With that rounding, band 5 entry in inner London gives {m(PAY.afcPay('england', '5', 0) + hc)}, the figure NHS Employers prints.</li>
+      <li><strong>Hourly, unsocial hours and overtime.</strong> England hourly rates as published, enhancements by band from section 2 of the NHS terms and conditions handbook, overtime at time and a half and double time on public holidays for bands 1 to 7, plain time for part-time staff up to 37.5 hours.</li>
+      <li><strong>Teachers.</strong> England: the advisory points of the School Teachers’ Pay and Conditions Document 2026 for September 2026 and September 2027, in all four pay areas, with the leadership, head teacher group, leading practitioner and unqualified ranges and the allowances. Scotland: the SNCT salary tables. Wales: the 2025 Welsh pay document. Northern Ireland: the determination of September 2025. An award announced but not printed in a scale is shown as still to come, never estimated.</li>
     </ul>
-
-    <h2>4. Premium Bonds</h2>
-    <p>NS&amp;I publishes the prize fund rate ({pc(P.premiumBonds.rate, 2)}), the odds per £1 Bond (1 in {h.num(P.premiumBonds.odds)}) and, each month, the number of prizes of each value. The engine stores the {P.premiumBonds.drawMonth} table and checks that its total, times twelve, divided by the eligible Bonds implied by the odds, gives back the published rate. The chance of at least one prize is computed exactly from the odds. The spread of winnings is simulated: {h.num(4000)} years of twelve draws, each prize value drawn as a Poisson count, with a fixed seed so every visitor sees the same numbers. For {m(10000)} the median is {m(spread.median)} a year, the mean {m(spread.mean)}, and the chance of winning nothing in a year {pc(spread.chanceNothing, 1)}. Prizes are tax free, so the comparison with a taxable account uses the gross rate that account must pay to leave the same amount after tax at your income. NS&amp;I's page gives two different start months for the current rate; the site shows the rate without claiming a start month it cannot confirm.</p>
-
+    <h2>2. Take-home pay</h2>
+    <ol>
+      <li><strong>Pension contribution.</strong> The tier is found from annual pensionable pay, and its rate is applied to all of it. Pensionable pay includes the London supplement and unsocial hours payments for NHS staff. For part-time staff and teachers the tier uses the pay actually earned.</li>
+      <li><strong>Income tax.</strong> On pay after the contribution (net pay arrangement). Personal Allowance of {m(P.tax.personalAllowance)}, withdrawn by £1 for each £2 above {m(P.tax.taperThreshold)}. Rest of the UK: 20, 40 and 45 %. Scotland: six rates from 19 to 48 %, the bands measured on taxable income above the allowance.</li>
+      <li><strong>National Insurance.</strong> 8 % between {m(P.tax.ni.primaryThreshold)} and {m(P.tax.ni.upperEarningsLimit)}, 2 % above, on pay before the pension, worked on an annual basis.</li>
+      <li><strong>Student loans.</strong> Plans 1, 2, 4 and 5 at 9 % and the postgraduate loan at 6 % above HMRC’s 2026/27 thresholds, on pay before the pension.</li>
+    </ol>
+    <p>Example: a band 5 at entry in England, {m(PAY.afcPay('england', '5', 0))}, pays {m(ex.pension)} in pension ({pc(ex.pensionRate)}), {m(ex.tax)} in income tax and {m(ex.ni)} in NI, and takes home {m(ex.net)} a year. The figures are annual and divided by twelve; a real payslip works month by month, which can shift a pound or two.</p>
+    <h2>3. Pension estimates</h2>
+    <p>The NHS Pension Scheme 2015 adds 1/{h.num(P.pension.nhsEW.accrual)} of each year’s pensionable pay and revalues the total by CPI plus {pc(P.pension.nhsEW.realRevaluation)} while you are active (NHSBSA). The Teachers’ Pension Scheme adds 1/{h.num(P.pension.tps.accrual)} (regulation 53 of the 2014 regulations) and revalues by CPI plus {pc(P.pension.tps.realRevaluation)}. The projection works in today’s money: each year’s slice grows by the real revaluation only. Normal pension age is the State Pension age with a floor of {h.num(P.pension.npaMin)} (Public Service Pensions Act 2013, section 10). A lump sum is £{h.num(P.pension.tps.commutation)} for each £1 a year of pension given up, capped for teachers at 30/7 of the pension (Teachers’ Pensions factsheet).</p>
+    <p>The contribution tables cover six schemes from April 2026; in England and Wales the NHS table has {h.num(T.length)} tiers, from {pc(T[0].rate)} to {pc(T.at(-1)!.rate)}.</p>
+    <h2>4. Tests</h2>
+    <p>Every build runs the engine tests and stops if one fails. They check, among others: band 5 entry in inner London at the NHS Employers figure; HCAS minimum and maximum; M1 and inner London U3 against the pay document; income tax at {m(30000)} and {m(60000)} in the rest of the UK and in Scotland; the Personal Allowance reaching nothing at {m(P.tax.personalAllowance * 2 + P.tax.taperThreshold)}; NHSBSA and Teachers’ Pensions tier boundaries to the penny; one and two years of career average accrual; the lump sum cap; and that the pension comes off before tax but not before NI or a student loan. Each content page is also built in strict mode: a link to a page that does not exist stops the build.</p>
     <h2>5. What is left out</h2>
     <ul>
-      <li>Dividends and their allowance, foreign interest, chargeable event gains on bonds and the Marriage Allowance.</li>
-      <li>Blind Person's Allowance, the High Income Child Benefit Charge and student loan repayments.</li>
-      <li>The timing of interest: the calculators assume it is paid in the year you choose. A bond that pays at maturity counts entirely in that year.</li>
-      <li>For Scottish taxpayers, Gift Aid and pension relief widen the Scottish bands in the same way as the UK ones: a close approximation, not checked for every band.</li>
-      <li>No figure is advice. The site ranks no provider and says nothing about which account to open.</li>
+      <li>Your tax code, if it is not the standard one; salary sacrifice schemes; on-call payments and bank shifts.</li>
+      <li>Pension estimates for the Scottish and Northern Ireland schemes, the NHS maximum lump sum, early retirement reductions and the annual allowance: no published figure was found that this site could cite.</li>
+      <li>The 2026/27 Agenda for Change scale for Northern Ireland and the September 2026 teacher scales of Wales and Northern Ireland, not published on {displayDate(LAST_UPDATED, 'en-GB')}.</li>
+      <li>Hourly rates for Scotland and Wales, which their pay pages do not publish.</li>
+      <li>No figure is advice, and the site does not know your pension record.</li>
     </ul>
-
     <h2>6. Sources</h2>
-    <p>The parameter file cites {sources.length} official pages, all read on {displayDate(P.retrieved_at, 'en-GB')}:</p>
+    <p>The parameter file cites {sources.length} official pages and documents, read on {displayDate(P.retrieved_at, 'en-GB')}:</p>
     <ul class="columns-1 text-sm md:columns-2">{sources.map(([, s]) => <li><a href={s.url} target="_blank" rel="nofollow noopener">{s.label.en}</a></li>)}</ul>
     <p>Errors: see the <a href={route('editorial', lang)}>editorial policy</a> and the <a href={route('contact', lang)}>contact page</a>.</p>
   </div>

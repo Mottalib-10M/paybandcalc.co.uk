@@ -20,7 +20,7 @@ export default definePage({
   },
   faqs: (h) => [
     { q: 'Why did my NHS pension rate go up when I got a pay rise?', a: 'Because your pay crossed a tier boundary. The rate of the new tier applies to all of your pensionable pay, so a small rise that takes you over a line can cost more in contributions than it adds in pay that year. The extra contribution buys no extra pension directly: the pension is always 1/54 of pay.' },
-    { q: 'Do part-time NHS staff pay a lower pension rate?', a: 'Often, because the tier is set on what you actually earn in a year, not on the full-time equivalent. A post on three fifths of full-time hours can sit one or two tiers lower than the same post worked full time. Your employer reviews the tier when your pay changes, so a change of hours can move you between tiers.' },
+    { q: 'Is the NHS pension tier based on full-time or actual pay?', a: 'Actual pay, because the tier is set on what you actually earn in a year, not on the full-time equivalent. A post on three fifths of full-time hours can sit one or two tiers lower than the same post worked full time. Your employer reviews the tier when your pay changes, so a change of hours can move you between tiers.' },
     { q: 'How much tax relief do I get on NHS pension contributions?', a: 'Relief at your top rate of income tax, automatically. Contributions come off before tax is worked out, so a basic rate taxpayer pays 80p for each £1 that goes into the scheme and a higher rate taxpayer 60p. In Scotland the relief follows the Scottish rates, from 19 % to 48 %. There is no relief on National Insurance.' },
   ],
   body: (h) => {
