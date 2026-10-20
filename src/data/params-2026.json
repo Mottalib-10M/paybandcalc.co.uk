@@ -1422,7 +1422,11 @@
       5861
      ]
     }
-   }
+   },
+   "stpcdStatus": "pending",
+   "hubPosted": "2026-09-16",
+   "averageSep2026": 52800,
+   "averageSep2027": 54400
   },
   "scotland": {
    "source": "snct_21",
@@ -1702,9 +1706,9 @@
    }
   },
   "dfe_hub": {
-   "url": "https://educationhub.blog.gov.uk/2026/07/teacher-pay-everything-you-need-to-know-about-the-latest-multi-year-pay-award/",
+   "url": "https://educationhub.blog.gov.uk/2026/09/teacher-pay-everything-you-need-to-know-about-the-latest-multi-year-pay-award/",
    "label": {
-    "en": "Department for Education, the multi-year teacher pay award (July 2026)"
+    "en": "Department for Education, Teacher pay: the latest multi-year pay award (16 September 2026)"
    }
   },
   "snct_21": {

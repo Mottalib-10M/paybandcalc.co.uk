@@ -146,7 +146,7 @@ const SPECS: Record<string, MiniSpec> = {
     title: 'Your next step on the teacher pay range', cta: 'Full teacher take-home', ctaPage: 'teacher-take-home-pay',
     inputs: [{ id: 'point', label: 'Pay point now', def: 0, options: EN_OPTS }, { id: 'area', label: 'Pay area', def: 0, options: T_AREA_OPTS }],
     run: (v) => { const i = Math.max(0, Math.min(Math.round(v.point), PAY.EN_POINTS.length - 1)), A = tArea(v.area), p = PAY.EN_POINTS[i], now = PAY.teacherEngland(p, A);
-      if (i === 5 || i === 8) return { head: ['Next step', i === 5 ? 'U1, by application' : 'none: top of U3'], rows: [['Your salary', m(now)], ['Take-home a month', m(tpsNet(now).monthly)]], note: i === 5 ? 'Moving from M6 to the upper range needs an application to the school.' : undefined };
+      if (i === 5 || i === 8) { const u1 = PAY.teacherEngland('U1', A); return { head: ['Next step', i === 5 ? `U1: ${m(u1 - now)} more` : 'none: top of U3'], rows: [['Your salary', m(now)], ['Take-home a month', m(tpsNet(now).monthly)], ...(i === 5 ? [['Take-home a month at U1', m(tpsNet(u1).monthly)] as [string, string]] : [])], note: i === 5 ? 'M6 is the top of the main pay range; the upper pay range starts at U1.' : 'U3 is the top of the upper pay range.' }; }
       const q = PAY.EN_POINTS[i + 1], nx = PAY.teacherEngland(q, A);
       return { head: [`Rise from ${p} to ${q}`, m(nx - now)], rows: [[`${p} salary`, m(now)], [`${q} salary`, m(nx)], ['Extra take-home a month', m(tpsNet(nx).monthly - tpsNet(now).monthly)]] }; },
   },
