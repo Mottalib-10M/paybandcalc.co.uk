@@ -1,0 +1,21 @@
+{
+ "name": "Pay Band Calc",
+ "short_name": "Pay Band Calc",
+ "description": "NHS Agenda for Change and teacher pay scales for 2026/27, with take-home pay after tax, NI, pension and student loan, and a pension estimate at retirement.",
+ "start_url": "/en/",
+ "display": "standalone",
+ "background_color": "#ffffff",
+ "theme_color": "#1F4E79",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}

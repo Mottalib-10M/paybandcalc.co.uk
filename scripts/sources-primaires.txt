@@ -1,0 +1,16 @@
+# Domaines des sources primaires de uk-nhs-teachers-pay (lu par check-regles.py et check-seo.py)
+
+# NHS Employers : organe de la NHS Confederation qui négocie et publie au nom des employeurs du NHS anglais les barèmes Agenda for Change (pay circulars, Handbook) ; seul éditeur du barème 2026/27 et des taux HCAS
+nhsemployers.org
+
+# Teachers' Pensions : administrateur du Teachers' Pension Scheme (Angleterre et pays de Galles) pour le Department for Education ; publie les tranches de cotisation et les règles du régime CARE
+teacherspensions.co.uk
+
+# SNCT : Scottish Negotiating Committee for Teachers, organe tripartite (Scottish Government, COSLA, syndicats) qui fixe par accord les barèmes des enseignants écossais (Handbook, Appendix 2.1)
+snct.org.uk
+
+# HSC Pension Service (Business Services Organisation, organisme public d'Irlande du Nord) : administre le HSC Pension Scheme et publie ses tranches de cotisation
+hscni.net
+
+# NHS Wales : site du service de santé gallois, qui héberge les pay circulars AfC(W) signées par le Welsh Government
+nhs.wales

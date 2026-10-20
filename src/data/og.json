@@ -1,0 +1,13 @@
+{
+ "accent": "#1F4E79",
+ "symbol": "PAY",
+ "variants": [
+  {
+   "file": "og-en.png",
+   "title": "NHS and teacher pay 2026/27\nTake-home pay and pension",
+   "subtitle": "Agenda for Change bands 2 to 9 · M1 to U3 · HCAS and London areas · NHS Pension and TPS",
+   "badge": "NHS Employers circular · STRB 36th report",
+   "brand": "Pay Band Calc"
+  }
+ ]
+}
