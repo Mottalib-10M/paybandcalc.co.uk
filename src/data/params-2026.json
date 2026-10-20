@@ -1697,7 +1697,16 @@
     114942,
     119649,
     124365
-   ]
+   ],
+   "mainAug2025": [
+    34938,
+    41916,
+    44295,
+    46866,
+    49839,
+    52614
+   ],
+   "roundTo": 3
   },
   "wales": {
    "source": "wales_stpcd",
@@ -1720,13 +1729,37 @@
     "unqualifiedAward": 0.05,
     "announced": "2026-10-14",
     "backdated": "2026-09-01",
-    "source": "wales_tch_2026"
-   }
+    "source": "wales_tch_2026",
+    "iwprbRecommended": 0.0425,
+    "singleScale": true
+   },
+   "allowances": {
+    "tlr1": [
+     10354,
+     17518
+    ],
+    "tlr2": [
+     3590,
+     8764
+    ],
+    "tlr3": [
+     714,
+     3540
+    ],
+    "aln": [
+     2838,
+     5595
+    ]
+   },
+   "leadingPractitioner": [
+    52939,
+    80478
+   ]
   },
   "ni": {
    "source": "ni_tch",
    "effective": "2025-09-01",
-   "published": "2026-01-14",
+   "published": "2026-01-13",
    "main": {
     "M2": 32916,
     "M3": 35185,
@@ -1779,7 +1812,21 @@
      99622,
      143422
     ]
-   ]
+   ],
+   "award2025": 0.04,
+   "sen": [
+    2717,
+    5362
+   ],
+   "recruitment": [
+    1627,
+    3190
+   ],
+   "leadershipSpine": {
+    "L1": 51834,
+    "L43": 143422,
+    "points": 43
+   }
   }
  },
  "sources": {
