@@ -1015,7 +1015,7 @@
  },
  "teachers": {
   "england": {
-   "source": "strb36",
+   "source": "stpcd26",
    "accepted": "2026-07-01",
    "awardSep2026": 0.035,
    "awardSep2027": 0.03,
@@ -1421,12 +1421,216 @@
       2972,
       5861
      ]
+    },
+    "headGroups": [
+     [
+      [
+       62438,
+       83072
+      ],
+      [
+       63966,
+       84582
+      ],
+      [
+       66818,
+       87411
+      ],
+      [
+       72877,
+       93407
+      ]
+     ],
+     [
+      [
+       65599,
+       89400
+      ],
+      [
+       67121,
+       90922
+      ],
+      [
+       69979,
+       93741
+      ],
+      [
+       76039,
+       99736
+      ]
+     ],
+     [
+      [
+       70752,
+       96217
+      ],
+      [
+       72275,
+       97732
+      ],
+      [
+       75129,
+       100553
+      ],
+      [
+       81185,
+       106554
+      ]
+     ],
+     [
+      [
+       76042,
+       103553
+      ],
+      [
+       77570,
+       105059
+      ],
+      [
+       80417,
+       107885
+      ],
+      [
+       86479,
+       113879
+      ]
+     ],
+     [
+      [
+       83901,
+       114208
+      ],
+      [
+       85428,
+       115724
+      ],
+      [
+       88287,
+       118548
+      ],
+      [
+       94342,
+       124544
+      ]
+     ],
+     [
+      [
+       90294,
+       125975
+      ],
+      [
+       91828,
+       127490
+      ],
+      [
+       94679,
+       130311
+      ],
+      [
+       100733,
+       136310
+      ]
+     ],
+     [
+      [
+       97180,
+       138880
+      ],
+      [
+       98712,
+       140387
+      ],
+      [
+       101561,
+       143213
+      ],
+      [
+       107620,
+       149210
+      ]
+     ],
+     [
+      [
+       107181,
+       153294
+      ],
+      [
+       108703,
+       154811
+      ],
+      [
+       111561,
+       157634
+      ],
+      [
+       117615,
+       163629
+      ]
+     ]
+    ],
+    "unqualified": {
+     "1": [
+      24444,
+      25657,
+      28559,
+      30217
+     ],
+     "2": [
+      26858,
+      28417,
+      31325,
+      32979
+     ],
+     "3": [
+      29621,
+      31181,
+      34087,
+      35744
+     ],
+     "4": [
+      32058,
+      33616,
+      36529,
+      38181
+     ],
+     "5": [
+      34826,
+      36381,
+      39291,
+      40940
+     ],
+     "6": [
+      37589,
+      39145,
+      42056,
+      43702
+     ]
     }
    },
-   "stpcdStatus": "pending",
+   "stpcdStatus": "published",
    "hubPosted": "2026-09-16",
    "averageSep2026": 52800,
-   "averageSep2027": 54400
+   "averageSep2027": 54400,
+   "stpcdPublished": "2026-10-16",
+   "directedHours": 1265,
+   "shortNoticeDays": 195,
+   "headUnits": {
+    "perPupil": {
+     "ks12": 7,
+     "ks3": 9,
+     "ks4": 11,
+     "ks5": 13
+    },
+    "groupMax": [
+     1000,
+     2200,
+     3500,
+     5000,
+     7500,
+     11000,
+     17000
+    ]
+   }
   },
   "scotland": {
    "source": "snct_21",
@@ -1705,6 +1909,12 @@
     "en": "School Teachers' Review Body, 36th Report (CP 1602, July 2026), Appendix F"
    }
   },
+  "stpcd26": {
+   "url": "https://assets.publishing.service.gov.uk/media/6ad21656dfa45fcb6753cb0b/School_teachers_pay_and_conditions_document_and_guidance_2026.pdf",
+   "label": {
+    "en": "Department for Education, School Teachers' Pay and Conditions Document 2026 and guidance (16 October 2026)"
+   }
+  },
   "dfe_hub": {
    "url": "https://educationhub.blog.gov.uk/2026/09/teacher-pay-everything-you-need-to-know-about-the-latest-multi-year-pay-award/",
    "label": {
@@ -1763,6 +1973,12 @@
    "url": "https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief",
    "label": {
     "en": "GOV.UK, Tax on your private pension contributions: tax relief"
+   }
+  },
+  "tp_parttime": {
+   "url": "https://www.teacherspensions.co.uk/news/employers/2014/10/tiered-contributions-changes.aspx",
+   "label": {
+    "en": "Teachers' Pensions, Tiered contributions: changes from April 2015 (part-time members on actual earnings)"
    }
   }
  }

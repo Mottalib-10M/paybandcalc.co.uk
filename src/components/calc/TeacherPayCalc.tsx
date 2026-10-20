@@ -28,7 +28,7 @@ function pointsFor(n: Nation): Array<{ value: string; label: string }> {
   return WALES_POINTS.map((p) => ({ value: p, label: p }));
 }
 function salary(n: Nation, point: string, area: TeacherArea, year: EnYear): number {
-  if (n === 'england') return point.startsWith('Q') ? unqualifiedEngland(Number(point.slice(1)), area) : teacherEngland(point as EnPoint, area, year);
+  if (n === 'england') return point.startsWith('Q') ? unqualifiedEngland(Number(point.slice(1)), area, year) : teacherEngland(point as EnPoint, area, year);
   if (n === 'scotland') return teacherScotland(Number(point.slice(1)));
   return n === 'wales' ? teacherWales(point as (typeof WALES_POINTS)[number]) : teacherNI(point as (typeof WALES_POINTS)[number]);
 }
@@ -58,7 +58,7 @@ export default function TeacherPayCalc({ nation: n0 = 'england', point: p0 = 'M1
 
   const opts = pointsFor(nation);
   const pt = opts.some((o) => o.value === point) ? point : firstPoint(nation);
-  const yr: EnYear = point.startsWith('Q') ? 'sep2026' : year;
+  const yr: EnYear = year;
   const share = Math.max(0, Math.min(fte, 100)) / 100;
   const base = salary(nation, pt, area, yr) * share;
   const gross = base + allow * share;
@@ -70,7 +70,6 @@ export default function TeacherPayCalc({ nation: n0 = 'england', point: p0 = 'M1
   const notes: string[] = [];
   if (nation === 'wales') notes.push(`Wales: a ${formatPercent(T.wales.next.award, 1)} award from ${displayDate(T.wales.next.backdated, 'en-GB')} was announced on ${displayDate(T.wales.next.announced, 'en-GB')}; the new scale is still to come in the revised Pay and Conditions Document, so this is the September 2025 scale.`);
   if (nation === 'ni') notes.push('Northern Ireland: the September 2026 scale had not been published on 20 October 2026, so this is the scale from 1 September 2025.');
-  if (point.startsWith('Q') && year === 'sep2027') notes.push('The STRB report sets the unqualified range for September 2027 too, but this calculator shows the September 2026 figures for it.');
   const onNation = (v: string) => { const n = v as Nation; setNation(n); setPoint(firstPoint(n)); setTax(n === 'scotland' ? 'scotland' : 'ruk'); };
 
   return (
@@ -114,7 +113,7 @@ export default function TeacherPayCalc({ nation: n0 = 'england', point: p0 = 'M1
           total={['Take-home a year', m(r.net)]} notes={notes} />
       </div>
       <div aria-hidden="true" className="fixed inset-x-0 bottom-0 z-40 border-t border-navy-300 bg-white/95 px-4 py-2 text-sm text-navy-900 shadow-[0_-2px_6px_rgba(0,0,0,0.06)] lg:hidden print:hidden">{opts.find((o) => o.value === pt)?.label}, {m(gross)}: <strong className="tabular-nums">{m(r.monthly)}</strong> a month take-home</div>
-      <Actions methodHref={methodHref} note="Scales from the STRB 36th report, the SNCT tables and the Welsh and NI documents; tax from HMRC 2026/27." />
+      <Actions methodHref={methodHref} note="Scales from the School Teachers’ Pay and Conditions Document 2026, the SNCT tables and the Welsh and NI documents; tax from HMRC 2026/27." />
     </div>
   );
 }

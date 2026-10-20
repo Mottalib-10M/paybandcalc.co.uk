@@ -70,8 +70,8 @@ export function teacherEngland(point: EnPoint, area: TeacherArea = 0, year: EnYe
   const row = (y.main as Record<string, number[]>)[point] ?? (y.upper as Record<string, number[]>)[point];
   return row[area];
 }
-export function unqualifiedEngland(point: number, area: TeacherArea = 0): number {
-  return (P.teachers.england.sep2026.unqualified as Record<string, number[]>)[String(point)][area];
+export function unqualifiedEngland(point: number, area: TeacherArea = 0, year: EnYear = 'sep2026'): number {
+  return (P.teachers.england[year].unqualified as Record<string, number[]>)[String(point)][area];
 }
 export const WALES_POINTS = ['M2', 'M3', 'M4', 'M5', 'M6', 'U1', 'U2', 'U3'] as const;
 export function teacherWales(point: (typeof WALES_POINTS)[number]): number {

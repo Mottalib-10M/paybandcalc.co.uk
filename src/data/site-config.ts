@@ -11,7 +11,7 @@ export const SITE_FOUNDED = '2026';
 export const LAST_UPDATED = '2026-10-20';
 export const AUTHOR_NAME = 'Radif Partners';
 export const AUTHOR_ROLE: Record<string, string> = {"en": "Independent publisher of pay scale, take-home and pension calculators for NHS staff and teachers in the UK"};
-export const AUTHOR_DESC: Record<string, string> = {"en": "Radif Partners reads every figure on Pay Band Calc from the body that sets it: the Agenda for Change pay circulars of NHS Employers, the Welsh Government, gov.scot and the Department of Health in Belfast, the STRB 36th report and the SNCT salary tables for teachers, the contribution tiers published by NHSBSA, Teachers' Pensions and the SPPA, and HMRC's 2026 to 2027 rates for tax, National Insurance and student loans. Nobody pays the site to recommend a union, an adviser or a lender."};
+export const AUTHOR_DESC: Record<string, string> = {"en": "Radif Partners reads every figure on Pay Band Calc from the body that sets it: the Agenda for Change pay circulars of NHS Employers, the Welsh Government, gov.scot and the Department of Health in Belfast, the School Teachers' Pay and Conditions Document 2026 and the SNCT salary tables for teachers, the contribution tiers published by NHSBSA, Teachers' Pensions and the SPPA, and HMRC's 2026 to 2027 rates for tax, National Insurance and student loans. Nobody pays the site to recommend a union, an adviser or a lender."};
 /** Sujets sur lesquels l'editeur est competent (schema.org knowsAbout). Ce sont les
  *  themes reellement traites par le site, pas une liste de mots-cles : un sujet
  *  declare ici sans page qui le couvre est une declaration fausse. */

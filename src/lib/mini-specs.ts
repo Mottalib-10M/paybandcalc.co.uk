@@ -128,7 +128,7 @@ const SPECS: Record<string, MiniSpec> = {
     run: (v) => { const g = P.teachers.england.sep2026.headGroups[Math.max(0, Math.min(Math.round(v.group), 7))][tArea(v.area)];
       const lo = tpsNet(g[0]), hi = tpsNet(g[1]);
       return { head: ['Pay range', `${m(g[0])} to ${m(g[1])}`], rows: [['Take-home a month at the bottom', m(lo.monthly)], ['Take-home a month at the top', m(hi.monthly)], ['Pension rate at the top', pc(hi.pensionRate)], ['Top rate of income tax', pc(TAX.incomeTax(g[1] - hi.pension).marginal, 0)]],
-        note: 'Group ranges from 1 September 2026, as recommended in the STRB 36th report and accepted on 1 July 2026.' }; },
+        note: 'Group ranges from 1 September 2026, School Teachers’ Pay and Conditions Document 2026, Table 2.' }; },
   },
   tlr: {
     title: 'What a TLR or SEN allowance adds to take-home', cta: 'All teacher pay points', ctaPage: 'teacher-take-home-pay',
