@@ -1873,7 +1873,7 @@
    }
   },
   "nhsbsa_tiers": {
-   "url": "https://www.nhsbsa.nhs.uk/employer-hub/technical-guidance/membership-contributions-and-pay",
+   "url": "https://www.nhsbsa.nhs.uk/employer-hub/technical-guidance/pay-and-contributions",
    "label": {
     "en": "NHSBSA, Membership, contributions and pay (tiers from 1 April 2026)"
    }
@@ -1981,9 +1981,9 @@
    }
   },
   "wales_stpcd": {
-   "url": "https://www.gov.wales/sites/default/files/publications/2026-02/school-teachers%E2%80%99-pay-and-conditions-wales-document-2025-revised-february-2026_0.pdf",
+   "url": "https://www.gov.wales/sites/default/files/publications/2026-02/school-teachers%E2%80%99-pay-and-conditions-wales-document-2025-revised-march-2026_0.pdf",
    "label": {
-    "en": "Welsh Government, School Teachers' Pay and Conditions (Wales) Document 2025, revised February 2026"
+    "en": "Welsh Government, School Teachers' Pay and Conditions (Wales) Document 2025, revised March 2026"
    }
   },
   "wales_tch_2026": {

@@ -3,4 +3,4 @@ Allow: /
 
 Disallow: /*?*
 
-Sitemap: https://uk-nhs-teachers-pay.example/sitemap-index.xml
+Sitemap: https://paybandcalc.co.uk/sitemap-index.xml

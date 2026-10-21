@@ -1,5 +1,5 @@
 /** Configuration centrale du site (générée par new-site.py). */
-export const SITE_URL = "https://uk-nhs-teachers-pay.example";
+export const SITE_URL = "https://paybandcalc.co.uk";
 export const SITE_NAMES: Record<string, string> = {"en": "Pay Band Calc"};
 export const LANG_TAGS: Record<string, string> = {"en": "en-GB"};
 export const OG_LOCALES: Record<string, string> = {"en": "en_GB"};
@@ -16,7 +16,7 @@ export const AUTHOR_DESC: Record<string, string> = {"en": "Radif Partners reads 
  *  themes reellement traites par le site, pas une liste de mots-cles : un sujet
  *  declare ici sans page qui le couvre est une declaration fausse. */
 export const KNOWS_ABOUT: Record<string, string[]> = {"en": ["Agenda for Change pay bands and pay progression", "High Cost Area Supplement for London", "School teachers' pay ranges in England, Scotland, Wales and Northern Ireland", "NHS Pension Scheme 2015 career average benefits", "Teachers' Pension Scheme career average benefits", "Tiered member pension contributions", "Income tax, National Insurance and student loan deductions"]};
-export const CONTACT_EMAIL = "contact@uk-nhs-teachers-pay.example";
+export const CONTACT_EMAIL = "contact@paybandcalc.co.uk";
 export const THEME_COLOR = '#1F4E79';
 export const LOGO_SYMBOL = 'PAY';
 export const BING_VERIFY_CODE = '';
